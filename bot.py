@@ -25,35 +25,43 @@ class BotInterface:
                 msg = event.text.lower()
                 self.params = self.api.get_profile_info(event.user_id)
                 if msg in ['привет', 'hi']:
-                    self.send_msg(event.user_id, f"Здравствуйте, {self.params['name']}")
+                    self.send_msg(event.user_id, f"Здравствуйте, {self.params} {self.params['name']}")
+                    self.send_msg(event.user_id, f'Введите команду: Поиск | Дальше | Пока')
                 elif msg == 'поиск':
                     if len(self.params['bdate'].split('.')) != 3:
-                        self.send_msg(event.user_id, f"Укажите ваш год рождения")
+                        self.send_msg(event.user_id, f"Укажите ваш год рождения в формате гггг")
                         for event in longpool.listen():
                             if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-                                self.params['bdate'] = "01.01." + event.text.lower()
+                                self.params['bdate'] = "dd.mm." + event.text.lower()
                                 break
+                    if self.params['city'] is None:
+                        if self.params['home_town'] is not None:
+                            self.params['city'] = self.api.id_city(self.params['home_town'])
+                        else:
+                            self.send_msg(event.user_id, f"Укажите ваш город")
+                            for event in longpool.listen():
+                                if event.type == VkEventType.MESSAGE_NEW and event.to_me:
+                                    city = event.text.lower()
+                                    self.params['city'] = self.api.id_city(city)
+                                    break
                     users = self.api.search_users(self.params)
                     user = users.pop()
                     # здесь логика дял проверки бд
                     photos_user = self.api.get_photos(user['id'])
-                    self.send_msg(event.user_id,
-                                  f"{user['name']}",
-                                  attachment=None)
                     attachment = ''
                     for num, photo in enumerate(photos_user):
-                        attachment += f'photo{photo["owner_id"]}_{photo["id"]}'
+                        attachment += f'photo{photo["owner_id"]}_{photo["id"]},'
                         if num == 2:
                             break
                     self.send_msg(event.user_id,
-                                  f'Результат поиска {user["name"]}',
+                                  f'Результат поиска {user["name"]} https://vk.com/id{user["id"]}',
                                   attachment=attachment)
 
                     # здесь логика для добавленяи в бд
                 elif msg == 'пока':
-                    self.send_msg(event.user_id, 'пока')
+                    self.send_msg(event.user_id, 'Пока')
                 else:
-                    self.send_msg(event.user_id, 'команда не опознана')
+                    self.send_msg(event.user_id, 'Команда не опознана, Введите команду: Поиск | Дальше | Пока')
 
 
 if __name__ == '__main__':

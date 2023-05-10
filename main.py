@@ -16,12 +16,20 @@ class VkTools:
                                 )
         user_info = {'name': info['first_name'] + ' ' + info['last_name'],
                      'id': info['id'],
-                     'city': info['city']['id'],
-                     'bdate': info['bdate'] if 'bdate' in info else None,
+                     'city': info['city']['id'] if 'city' in info else None,
+                     'bdate': info['bdate'],
                      'sex': info['sex'],
-                     'home_town': info['home_town']
+                     'home_town': info['home_town'] if 'home_town' in info else None
                      }
         return user_info
+
+    def id_city(self, city_name):
+        info, = self.api.method('database.getCities',
+                                {'q': city_name,
+                                 'need_all': 1,
+                                 'count': 1})['items']
+        city_id = info['id']
+        return city_id
 
     def search_users(self, params):
 
@@ -82,7 +90,7 @@ class VkTools:
                         }
                        )
 
-        res.sort(key=lambda x: x['likes'] + x['comments'] * 10, reverse=True)
+        res.sort(key=lambda x: x['likes'] + x['comments'], reverse=True)
 
         return res
 
