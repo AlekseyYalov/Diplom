@@ -32,14 +32,6 @@ try:
                 viewed_id.append(i[0])
         return viewed_id
 
-    # with connection.cursor() as cursor:
-    #     cursor.execute("""DROP TABLE views;
-    #     """)
-
 
 except Exception as e:
     print('[INFO] Error while working with PostgreSQL', e)
-# finally:
-# if connection:
-#     connection.close()
-#     print('[INFO] PostgreSQL connection closed')
