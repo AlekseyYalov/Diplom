@@ -1,5 +1,5 @@
-from datetime import datetime
 import vk_api
+from datetime import datetime
 from config import acces_token
 
 
@@ -19,7 +19,7 @@ class VkTools:
                      'city': info['city']['id'] if 'city' in info else None,
                      'bdate': info['bdate'],
                      'sex': info['sex'],
-                     'home_town': info['home_town'] if 'home_town' in info else None
+                     'home_town': info['home_town']
                      }
         return user_info
 
@@ -31,7 +31,7 @@ class VkTools:
         city_id = info['id']
         return city_id
 
-    def search_users(self, params):
+    def search_users(self, params, offset=None):
 
         sex = 1 if params['sex'] == 2 else 2
         city = params['city']
@@ -42,8 +42,8 @@ class VkTools:
         age_to = age + 5
 
         users = self.api.method('users.search',
-                                {'count': 10,
-                                 'offset': 0,
+                                {'count': 20,
+                                 'offset': offset,
                                  'age_from': age_from,
                                  'age_to': age_to,
                                  'sex': sex,
